@@ -22,7 +22,17 @@ export function registerOrderRoutes(app: FastifyInstance, orderService: OrderSer
     };
   });
 
-  // TODO: POST /orders/:orderId/cancel — not implemented yet (demo question 2)
+  // TODO: POST /orders/:orderId/cancel — not implemented yet
+    app.post('/orders/:orderId/cancel', async (req) => {
+    requireIdempotencyKey(req);
+    const { orderId } = req.params as { orderId: string };
+    const order = await orderService.cancel(orderId);
+    return {
+      orderId: order.id,
+      status: order.status,
+      total: { amountMinor: order.amountMinor, currency: order.currency },
+    };
+  });
 
   app.setErrorHandler((err, req, reply) => {
     if (err instanceof ProblemError) {
